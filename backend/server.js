@@ -1,42 +1,196 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+
 const pool = require("./config/db");
+
+const authRoutes =
+    require("./routes/authRoutes");
+
+const authenticateToken =
+    require("./middleware/authMiddleware");
+
 
 dotenv.config();
 
+
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT =
+    process.env.PORT || 5000;
+
+
+// =====================================================
+// MIDDLEWARE
+// =====================================================
 
 app.use(cors());
+
 app.use(express.json());
 
+
+// =====================================================
+// ROOT
+// =====================================================
+
 app.get("/", (req, res) => {
+
     res.json({
-        message: "CA Practice Management API is running"
+
+        message:
+            "CA Practice Management API is running"
+
     });
+
 });
 
-app.get("/api/health", async (req, res) => {
-    try {
-        const result = await pool.query("SELECT NOW()");
 
-        res.json({
-            status: "UP",
-            message: "Backend and PostgreSQL are working",
-            database_time: result.rows[0].now
-        });
-    } catch (error) {
-        console.error(error);
+// =====================================================
+// HEALTH CHECK
+// =====================================================
 
-        res.status(500).json({
-            status: "DOWN",
-            message: "Database connection failed"
-        });
+app.get(
+    "/api/health",
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    "SELECT NOW()"
+                );
+
+
+            res.json({
+
+                status: "UP",
+
+                message:
+                    "Backend and PostgreSQL are working",
+
+                database_time:
+                    result.rows[0].now
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            res.status(500).json({
+
+                status: "DOWN",
+
+                message:
+                    "Database connection failed"
+
+            });
+
+        }
+
     }
-});
+);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
+// =====================================================
+// AUTH ROUTES
+// =====================================================
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
+
+
+// =====================================================
+// PROTECTED PROFILE
+// =====================================================
+
+app.get(
+
+    "/api/profile",
+
+    authenticateToken,
+
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(
+
+                    `SELECT
+                        id,
+                        organization_id,
+                        full_name,
+                        email,
+                        role,
+                        created_at
+                     FROM users
+                     WHERE id = $1`,
+
+                    [req.user.userId]
+
+                );
+
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+
+                    message:
+                        "User not found"
+
+                });
+
+            }
+
+
+            res.json({
+
+                user:
+                    result.rows[0]
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "PROFILE ERROR:",
+                error
+            );
+
+
+            res.status(500).json({
+
+                message:
+                    "Failed to load profile"
+
+            });
+
+        }
+
+    }
+
+);
+
+
+// =====================================================
+// START SERVER
+// =====================================================
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `Server running on port ${PORT}`
+        );
+
+    }
+);
