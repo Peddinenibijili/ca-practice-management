@@ -7,6 +7,9 @@ const pool = require("./config/db");
 const authRoutes =
     require("./routes/authRoutes");
 
+const clientRoutes =
+    require("./routes/clientRoutes");
+
 const authenticateToken =
     require("./middleware/authMiddleware");
 
@@ -101,6 +104,16 @@ app.get(
 app.use(
     "/api/auth",
     authRoutes
+);
+
+
+// =====================================================
+// CLIENT ROUTES
+// =====================================================
+
+app.use(
+    "/api/clients",
+    clientRoutes
 );
 
 

@@ -1,0 +1,154 @@
+.add-client-page {
+    min-height: 100vh;
+    background: #f7f8fa;
+    padding: 30px;
+}
+
+
+.add-client-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+
+.add-client-header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+
+.add-client-header p {
+    margin-top: 6px;
+    color: #666;
+}
+
+
+.back-button {
+    padding: 10px 16px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    background: white;
+    cursor: pointer;
+}
+
+
+.add-client-card {
+    max-width: 800px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+    margin-bottom: 7px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 7px;
+    font-size: 15px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #555;
+}
+
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+.form-error {
+    background: #fff0f0;
+    padding: 12px 15px;
+    border-radius: 7px;
+    margin-bottom: 20px;
+}
+
+
+.form-success {
+    background: #effaf1;
+    padding: 12px 15px;
+    border-radius: 7px;
+    margin-bottom: 20px;
+}
+
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+
+.cancel-button,
+.save-button {
+    padding: 12px 22px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+
+.cancel-button {
+    border: 1px solid #ddd;
+    background: white;
+}
+
+
+.save-button {
+    border: none;
+}
+
+
+.cancel-button:disabled,
+.save-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+@media (max-width: 768px) {
+
+    .add-client-page {
+        padding: 15px;
+    }
+
+
+    .add-client-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+
+    .add-client-card {
+        padding: 20px;
+    }
+
+}

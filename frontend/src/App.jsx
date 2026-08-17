@@ -7,8 +7,11 @@ import {
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Clients from "./pages/Clients";
+import AddClient from "./pages/AddClient";
 
 import "./App.css";
+
 
 function App() {
 
@@ -25,20 +28,35 @@ function App() {
                     }
                 />
 
+
                 <Route
                     path="/login"
                     element={<Login />}
                 />
+
 
                 <Route
                     path="/dashboard"
                     element={<Dashboard />}
                 />
 
+
+                <Route
+                    path="/clients"
+                    element={<Clients />}
+                />
+                <Route
+                    path="/clients/new"
+                    element={<AddClient />}
+                />
+
             </Routes>
 
         </BrowserRouter>
+
     );
+
 }
+
 
 export default App;
