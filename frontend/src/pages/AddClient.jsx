@@ -122,7 +122,39 @@ function AddClient() {
             return;
 
         }
+     
+        // ---------------------------------------------
+        // PAN VALIDATION
+        // ---------------------------------------------
+        if (
+            formData.pan_number &&
+            !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(
+            formData.pan_number.toUpperCase()
+            ) 
+        ) {
 
+            setError(
+            "Invalid PAN number. Example: ABCDE1234F"
+            );
+
+            return;
+
+        }
+
+        // ---------------------------------------------
+        // GST VALIDATION
+        // ---------------------------------------------
+        if (
+            formData.gst_number &&
+            !/^[0-9A-Z]{15}$/.test(
+                formData.gst_number.toUpperCase()
+            )
+        ) {
+            setError(
+                "GST number must contain exactly 15 characters."
+            );
+            return;
+        }
 
         // ---------------------------------------------
         // EMAIL VALIDATION

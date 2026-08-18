@@ -13,6 +13,9 @@ const clientRoutes =
 const authenticateToken =
     require("./middleware/authMiddleware");
 
+const dashboardRoutes =
+    require("./routes/dashboardRoutes");
+
 
 dotenv.config();
 
@@ -114,6 +117,15 @@ app.use(
 app.use(
     "/api/clients",
     clientRoutes
+);
+
+// =====================================================
+// DASHBOARD ROUTES
+// =====================================================
+
+app.use(
+    "/api/dashboard",
+    dashboardRoutes
 );
 
 

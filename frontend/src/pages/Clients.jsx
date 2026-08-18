@@ -23,6 +23,9 @@ function Clients() {
 
     const [search, setSearch] = useState("");
 
+    const [typeFilter, setTypeFilter] = useState("all");
+
+    const [statusFilter, setStatusFilter] = useState("all");
 
     // =================================================
     // LOAD CLIENTS
@@ -63,6 +66,55 @@ function Clients() {
 
     };
 
+    const handleDelete = async (client) => {
+
+        const confirmed =
+            window.confirm(
+            `Are you sure you want to delete ${client.client_name}?`
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+        try {
+
+            await api.delete(
+                `/clients/${client.id}`
+            );
+
+
+            setClients((currentClients) =>
+                currentClients.filter(
+                    (item) =>
+                        item.id !== client.id
+                )
+            );
+
+            alert(
+                "Client deleted successfully."
+            );
+
+        } catch (error) {
+
+            console.error(
+                "DELETE CLIENT ERROR:",
+                error
+          );
+
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to delete client."
+           );
+
+        }
+
+    };
+    
 
     // =================================================
     // LOAD ON PAGE OPEN
@@ -85,7 +137,8 @@ function Clients() {
             const searchText =
                 search.toLowerCase();
 
-            return (
+
+            const matchesSearch =
 
                 client.client_name
                     ?.toLowerCase()
@@ -107,12 +160,29 @@ function Clients() {
 
                 client.gst_number
                     ?.toLowerCase()
-                    .includes(searchText)
+                    .includes(searchText);
 
+
+            const matchesType =
+
+                typeFilter === "all" ||
+
+                client.client_type === typeFilter;
+
+
+            const matchesStatus =
+
+                statusFilter === "all" ||
+
+                client.status === statusFilter;
+
+
+            return (
+                matchesSearch &&
+                matchesType &&
+                matchesStatus
             );
-
         });
-
 
     // =================================================
     // RENDER
@@ -170,6 +240,78 @@ function Clients() {
                         )
                     }
                 />
+                <select
+                    value={typeFilter}
+                    onChange={(event) =>
+                        setTypeFilter(event.target.value)
+                    }
+               >
+
+                <option value="all">
+                    All Types
+                </option>
+
+                <option value="Business">
+                    Business
+                </option>
+
+                <option value="Individual">
+                    Individual
+                </option>
+
+                <option value="Company">
+                    Company
+                </option>
+
+                <option value="Partnership">
+                    Partnership
+                </option>
+
+                <option value="LLP">
+                    LLP
+                </option>
+
+                <option value="Trust">
+                    Trust
+                </option>
+
+                </select>
+                <select
+                    value={statusFilter}
+                    onChange={(event) =>
+                        setStatusFilter(event.target.value)
+                   }
+                >
+
+                <option value="all">
+                    All Status
+                </option>
+
+                <option value="active">
+                    Active
+                </option>
+
+                <option value="inactive">
+                    Inactive
+                </option>
+
+                <option value="pending">
+                    Pending
+                </option>
+
+                <option value="suspended">
+                    Suspended
+                </option>
+
+                <option value="closed">
+                    Closed
+                </option>
+
+                <option value="completed">
+                    Completed
+                </option>
+
+                </select>
 
                 <span>
                     {filteredClients.length} clients
@@ -246,7 +388,8 @@ function Clients() {
             )}
 
 
-            {/* =========================================
+            {
+            /* =========================================
                 CLIENT TABLE
             ========================================= */}
 
@@ -378,6 +521,13 @@ function Clients() {
                                                 }
                                             >
                                                 Edit
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleDelete(client)
+                                                }
+                                            >
+                                                Delete
                                             </button>
 
                                         </td>

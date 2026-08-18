@@ -1,5 +1,7 @@
 const express = require("express");
 
+const router = express.Router();
+
 const {
     getClients,
     getClientById,
@@ -11,7 +13,7 @@ const {
 const authenticateToken =
     require("../middleware/authMiddleware");
 
-const router = express.Router();
+
 
 
 // GET ALL CLIENTS

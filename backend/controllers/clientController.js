@@ -11,6 +11,11 @@ exports.getClients = async (req, res) => {
 
         const organizationId = req.user.organizationId;
 
+        console.log(
+            "GET CLIENTS - ORGANIZATION:",
+            organizationId
+        );
+
         const result = await pool.query(
             `
             SELECT
@@ -34,7 +39,8 @@ exports.getClients = async (req, res) => {
         );
 
         res.status(200).json({
-            clients: result.rows
+            clients: result.rows,
+            count: result.rows.length
         });
 
     } catch (error) {
