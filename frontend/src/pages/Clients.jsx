@@ -506,7 +506,7 @@ function Clients() {
                                             <button
                                                 onClick={() =>
                                                     navigate(
-                                                        `/clients/${client.id}`
+                                                        `/clients/${client.id}/profile`
                                                     )
                                                 }
                                             >

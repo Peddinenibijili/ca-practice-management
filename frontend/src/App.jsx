@@ -11,6 +11,7 @@ import Clients from "./pages/Clients";
 import AddClient from "./pages/AddClient";
 import EditClient from "./pages/EditClient";
 import ClientDetails from "./pages/ClientDetails";
+import ClientProfile from "./pages/ClientProfile";
 
 import "./App.css";
 
@@ -59,7 +60,10 @@ function App() {
                     path="/clients/:id"
                     element={<ClientDetails />}
                 />
-
+                <Route
+                    path="/clients/:id/profile"
+                    element={<ClientProfile />}
+                />
             </Routes>
 
         </BrowserRouter>
