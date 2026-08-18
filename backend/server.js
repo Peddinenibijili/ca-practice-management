@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 
 const pool = require("./config/db");
 
+const path = require("path");
+
 const authRoutes =
     require("./routes/authRoutes");
 
@@ -15,6 +17,9 @@ const authenticateToken =
 
 const dashboardRoutes =
     require("./routes/dashboardRoutes");
+
+const documentRoutes =
+    require("./routes/documentRoutes");
 
 
 dotenv.config();
@@ -127,6 +132,31 @@ app.use(
     "/api/dashboard",
     dashboardRoutes
 );
+
+// =====================================================
+// SERVE UPLOADS
+// =====================================================    
+
+app.use(
+    "/uploads",
+    express.static(
+        path.join(
+            __dirname,
+            "uploads"
+        )
+    )
+);
+
+
+// =====================================================
+// DOCUMENT ROUTES
+// =====================================================    
+
+app.use(
+    "/api",
+    documentRoutes
+);
+
 
 
 // =====================================================

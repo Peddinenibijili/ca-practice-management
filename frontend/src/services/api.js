@@ -79,4 +79,9 @@ api.interceptors.response.use(
 );
 
 
+await api.post(
+    `/clients/${id}/documents`,
+    formData
+);
+
 export default api;

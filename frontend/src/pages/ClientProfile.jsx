@@ -11,6 +11,302 @@ import {
 import api from "../services/api";
 
 
+const [selectedFile, setSelectedFile] =
+    useState(null);
+
+const [documentName, setDocumentName] =
+    useState("");
+
+const [documentType, setDocumentType] =
+    useState("");
+
+const [uploading, setUploading] =
+    useState(false);
+
+const handleFileChange = (event) => {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+
+        return;
+
+    }
+
+
+    setSelectedFile(file);
+
+};
+
+const handleUpload = async () => {
+
+    if (!selectedFile) {
+
+        alert(
+            "Please select a file."
+        );
+
+        return;
+
+    }
+
+
+    if (!documentName.trim()) {
+
+        alert(
+            "Please enter document name."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        setUploading(true);
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "document",
+            selectedFile
+        );
+
+
+        formData.append(
+            "document_name",
+            documentName
+        );
+
+
+        formData.append(
+            "document_type",
+            documentType
+        );
+
+
+        const response =
+            await api.post(
+
+                `/clients/${id}/documents`,
+
+                formData
+
+            );
+
+
+        console.log(
+            "UPLOAD RESPONSE:",
+            response.data
+        );
+
+
+        alert(
+            "Document uploaded successfully."
+        );
+
+
+        // Add new document to UI
+
+        setDocuments(
+            (previousDocuments) => [
+
+                response.data.document,
+
+                ...previousDocuments
+
+            ]
+        );
+
+
+        // Reset form
+
+        setSelectedFile(null);
+
+        setDocumentName("");
+
+        setDocumentType("");
+
+
+        document.getElementById(
+            "document-upload-input"
+        ).value = "";
+
+
+    } catch (error) {
+
+        console.error(
+            "UPLOAD ERROR:",
+            error
+        );
+
+
+        alert(
+            error.response?.data?.message ||
+            "Failed to upload document."
+        );
+
+
+    } finally {
+
+        setUploading(false);
+
+    }
+
+};
+
+
+<div className="document-upload-box">
+
+    <h3>
+        Upload Document
+    </h3>
+
+
+    <div>
+
+        <label>
+            Document Name
+        </label>
+
+
+        <input
+            type="text"
+            value={documentName}
+            onChange={(e) =>
+                setDocumentName(
+                    e.target.value
+                )
+            }
+            placeholder="Example: PAN Card"
+        />
+
+    </div>
+
+
+    <br />
+
+
+    <div>
+
+        <label>
+            Document Type
+        </label>
+
+
+        <select
+            value={documentType}
+            onChange={(e) =>
+                setDocumentType(
+                    e.target.value
+                )
+            }
+        >
+
+            <option value="">
+                Select Type
+            </option>
+
+            <option value="Identity">
+                Identity
+            </option>
+
+            <option value="GST">
+                GST
+            </option>
+
+            <option value="Income Tax">
+                Income Tax
+            </option>
+
+            <option value="Bank">
+                Bank
+            </option>
+
+            <option value="Company">
+                Company
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <br />
+
+
+    <div>
+
+        <label>
+            File
+        </label>
+
+
+        <input
+            id="document-upload-input"
+            type="file"
+            accept="
+                .pdf,
+                .jpg,
+                .jpeg,
+                .png,
+                .doc,
+                .docx,
+                .xls,
+                .xlsx
+            "
+            onChange={
+                handleFileChange
+            }
+        />
+
+    </div>
+
+
+    <br />
+
+
+    {selectedFile && (
+
+        <p>
+
+            Selected:
+
+            {" "}
+
+            <strong>
+                {selectedFile.name}
+            </strong>
+
+        </p>
+
+    )}
+
+
+    <button
+        onClick={handleUpload}
+        disabled={uploading}
+    >
+
+        {uploading
+            ? "Uploading..."
+            : "Upload Document"
+        }
+
+    </button>
+
+</div>
+
 function ClientProfile() {
 
     const {
@@ -296,93 +592,154 @@ function ClientProfile() {
             </div>
 
 
-            {/* ============================ */}
-            {/* DOCUMENTS */}
-            {/* ============================ */}
+{/* ============================ */}
+{/* DOCUMENTS */}
+{/* ============================ */}
 
-            <div className="profile-card">
+<div className="profile-card">
 
-                <h2>
-                    Documents
-                </h2>
+    <div
+        style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+        }}
+    >
 
-
-                {documents.length === 0 ? (
-
-                    <p>
-                        No documents uploaded yet.
-                    </p>
-
-                ) : (
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Document
-                                </th>
-
-                                <th>
-                                    Type
-                                </th>
-
-                                <th>
-                                    Status
-                                </th>
-
-                            </tr>
-
-                        </thead>
+        <h2>
+            Documents
+        </h2>
 
 
-                        <tbody>
+        <button
+            onClick={() =>
+                document.getElementById(
+                    "document-upload-input"
+                ).click()
+            }
+        >
+            + Upload Document
+        </button>
 
-                            {documents.map(
-                                (document) => (
+    </div>
 
-                                    <tr
-                                        key={
-                                            document.id
-                                        }
-                                    >
 
-                                        <td>
-                                            {
-                                                document.document_name
-                                            }
-                                        </td>
+    <input
+        id="document-upload-input"
+        type="file"
+        style={{
+            display: "none"
+        }}
+    />
 
-                                        <td>
-                                            {
-                                                document.document_type
-                                            }
-                                        </td>
 
-                                        <td>
-                                            {
-                                                document.document_status
-                                            }
-                                        </td>
+    {documents.length === 0 ? (
 
-                                    </tr>
+        <p>
+            No documents uploaded yet.
+        </p>
 
-                                )
-                            )}
+    ) : (
 
-                        </tbody>
+        <table>
 
-                    </table>
+            <thead>
 
+                <tr>
+
+                    <th>
+                        Document
+                    </th>
+
+                    <th>
+                        Type
+                    </th>
+
+                    <th>
+                        File
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {documents.map(
+                    (document) => (
+
+                        <tr
+                            key={
+                                document.id
+                            }
+                        >
+
+                            <td>
+                                {
+                                    document.document_name
+                                }
+                            </td>
+
+
+                            <td>
+                                {
+                                    document.document_type
+                                }
+                            </td>
+
+
+                            <td>
+                                {
+                                    document.file_name
+                                }
+                            </td>
+
+
+                            <td>
+                                {
+                                    document.document_status
+                                }
+                            </td>
+
+
+                            <td>
+
+                                <button>
+                                    View
+                                </button>
+
+
+                                <button>
+                                    Delete
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    )
                 )}
 
-            </div>
+            </tbody>
 
-        </div>
+        </table>
 
-    );
+    )}
+
+</div>
+
+</div>
+
+);
 
 }
 
