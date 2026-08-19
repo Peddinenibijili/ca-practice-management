@@ -1,76 +1,86 @@
+import React from "react";
 import {
-    BrowserRouter,
-    Routes,
-    Route,
-    Navigate
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
 } from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
-import AddClient from "./pages/AddClient";
-import EditClient from "./pages/EditClient";
-import ClientDetails from "./pages/ClientDetails";
 import ClientProfile from "./pages/ClientProfile";
 
-import "./App.css";
-
+import MainLayout from "./components/Layout/MainLayout";
 
 function App() {
+  return (
+    <BrowserRouter>
 
-    return (
+      <Routes>
 
-        <BrowserRouter>
+        {/* Login */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-            <Routes>
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          }
+        />
 
-                <Route
-                    path="/"
-                    element={
-                        <Navigate to="/login" />
-                    }
-                />
+        {/* Clients */}
+        <Route
+          path="/clients"
+          element={
+            <MainLayout>
+              <Clients />
+            </MainLayout>
+          }
+        />
 
+        {/* Client Profile */}
+        <Route
+          path="/clients/:id"
+          element={
+            <MainLayout>
+              <ClientProfile />
+            </MainLayout>
+          }
+        />
 
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
+        {/* Default */}
+        <Route
+          path="/"
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
+        />
 
+        {/* Unknown route */}
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/dashboard"
+              replace
+            />
+          }
+        />
 
-                <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                />
+      </Routes>
 
-
-                <Route
-                    path="/clients"
-                    element={<Clients />}
-                />
-                <Route
-                    path="/clients/new"
-                    element={<AddClient />}
-                />
-                <Route
-                    path="/clients/:id/edit"
-                    element={<EditClient />}
-                />
-                <Route
-                    path="/clients/:id"
-                    element={<ClientDetails />}
-                />
-                <Route
-                    path="/clients/:id/profile"
-                    element={<ClientProfile />}
-                />
-            </Routes>
-
-        </BrowserRouter>
-
-    );
-
+    </BrowserRouter>
+  );
 }
-
 
 export default App;

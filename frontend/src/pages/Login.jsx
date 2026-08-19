@@ -28,6 +28,12 @@ function Login() {
                 }
             );
 
+            console.log(
+                "LOGIN RESPONSE:",
+                response.data
+            );
+
+
             // Save JWT
             localStorage.setItem(
                 "token",

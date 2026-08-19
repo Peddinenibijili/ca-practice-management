@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const organizationId = req.user.organizationId;
 
 
 // =====================================================

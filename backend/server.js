@@ -121,6 +121,7 @@ app.use(
 
 app.use(
     "/api/clients",
+    authenticateToken,
     clientRoutes
 );
 
@@ -130,6 +131,7 @@ app.use(
 
 app.use(
     "/api/dashboard",
+    authenticateToken,
     dashboardRoutes
 );
 
@@ -154,6 +156,7 @@ app.use(
 
 app.use(
     "/api",
+    authenticateToken,
     documentRoutes
 );
 

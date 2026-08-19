@@ -1,745 +1,578 @@
-import {
-    useEffect,
-    useState
-} from "react";
-
-import {
-    useNavigate,
-    useParams
-} from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
-
-
-const [selectedFile, setSelectedFile] =
-    useState(null);
-
-const [documentName, setDocumentName] =
-    useState("");
-
-const [documentType, setDocumentType] =
-    useState("");
-
-const [uploading, setUploading] =
-    useState(false);
-
-const handleFileChange = (event) => {
-
-    const file =
-        event.target.files[0];
-
-
-    if (!file) {
-
-        return;
-
-    }
-
-
-    setSelectedFile(file);
-
-};
-
-const handleUpload = async () => {
-
-    if (!selectedFile) {
-
-        alert(
-            "Please select a file."
-        );
-
-        return;
-
-    }
-
-
-    if (!documentName.trim()) {
-
-        alert(
-            "Please enter document name."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        setUploading(true);
-
-
-        const formData =
-            new FormData();
-
-
-        formData.append(
-            "document",
-            selectedFile
-        );
-
-
-        formData.append(
-            "document_name",
-            documentName
-        );
-
-
-        formData.append(
-            "document_type",
-            documentType
-        );
-
-
-        const response =
-            await api.post(
-
-                `/clients/${id}/documents`,
-
-                formData
-
-            );
-
-
-        console.log(
-            "UPLOAD RESPONSE:",
-            response.data
-        );
-
-
-        alert(
-            "Document uploaded successfully."
-        );
-
-
-        // Add new document to UI
-
-        setDocuments(
-            (previousDocuments) => [
-
-                response.data.document,
-
-                ...previousDocuments
-
-            ]
-        );
-
-
-        // Reset form
-
-        setSelectedFile(null);
-
-        setDocumentName("");
-
-        setDocumentType("");
-
-
-        document.getElementById(
-            "document-upload-input"
-        ).value = "";
-
-
-    } catch (error) {
-
-        console.error(
-            "UPLOAD ERROR:",
-            error
-        );
-
-
-        alert(
-            error.response?.data?.message ||
-            "Failed to upload document."
-        );
-
-
-    } finally {
-
-        setUploading(false);
-
-    }
-
-};
-
-
-<div className="document-upload-box">
-
-    <h3>
-        Upload Document
-    </h3>
-
-
-    <div>
-
-        <label>
-            Document Name
-        </label>
-
-
-        <input
-            type="text"
-            value={documentName}
-            onChange={(e) =>
-                setDocumentName(
-                    e.target.value
-                )
-            }
-            placeholder="Example: PAN Card"
-        />
-
-    </div>
-
-
-    <br />
-
-
-    <div>
-
-        <label>
-            Document Type
-        </label>
-
-
-        <select
-            value={documentType}
-            onChange={(e) =>
-                setDocumentType(
-                    e.target.value
-                )
-            }
-        >
-
-            <option value="">
-                Select Type
-            </option>
-
-            <option value="Identity">
-                Identity
-            </option>
-
-            <option value="GST">
-                GST
-            </option>
-
-            <option value="Income Tax">
-                Income Tax
-            </option>
-
-            <option value="Bank">
-                Bank
-            </option>
-
-            <option value="Company">
-                Company
-            </option>
-
-            <option value="Other">
-                Other
-            </option>
-
-        </select>
-
-    </div>
-
-
-    <br />
-
-
-    <div>
-
-        <label>
-            File
-        </label>
-
-
-        <input
-            id="document-upload-input"
-            type="file"
-            accept="
-                .pdf,
-                .jpg,
-                .jpeg,
-                .png,
-                .doc,
-                .docx,
-                .xls,
-                .xlsx
-            "
-            onChange={
-                handleFileChange
-            }
-        />
-
-    </div>
-
-
-    <br />
-
-
-    {selectedFile && (
-
-        <p>
-
-            Selected:
-
-            {" "}
-
-            <strong>
-                {selectedFile.name}
-            </strong>
-
-        </p>
-
-    )}
-
-
-    <button
-        onClick={handleUpload}
-        disabled={uploading}
-    >
-
-        {uploading
-            ? "Uploading..."
-            : "Upload Document"
-        }
-
-    </button>
-
-</div>
 
 function ClientProfile() {
 
-    const {
-        id
-    } = useParams();
+    // =====================================================
+    // GET CLIENT ID FROM URL
+    // =====================================================
+
+    const { id } = useParams();
+
+    const navigate = useNavigate();
 
 
-    const navigate =
-        useNavigate();
+    // =====================================================
+    // STATE
+    // =====================================================
+
+    const [client, setClient] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState("");
 
 
-    const [client, setClient] =
-        useState(null);
-
-
-    const [taxInformation, setTaxInformation] =
-        useState(null);
-
-
-    const [documents, setDocuments] =
-        useState([]);
-
-
-    const [loading, setLoading] =
-        useState(true);
-
-
-    const [error, setError] =
-        useState("");
-
+    // =====================================================
+    // LOAD CLIENT
+    // =====================================================
 
     useEffect(() => {
 
-        const loadProfile =
-            async () => {
-
-                try {
-
-                    setLoading(true);
-
-
-                    const response =
-                        await api.get(
-                            `/clients/${id}/profile`
-                        );
-
-
-                    console.log(
-                        "CLIENT PROFILE:",
-                        response.data
-                    );
-
-
-                    setClient(
-                        response.data.client
-                    );
-
-
-                    setTaxInformation(
-                        response.data.taxInformation
-                    );
-
-
-                    setDocuments(
-                        response.data.documents || []
-                    );
-
-
-                } catch (error) {
-
-                    console.error(
-                        "PROFILE ERROR:",
-                        error
-                    );
-
-
-                    setError(
-                        "Unable to load client profile."
-                    );
-
-
-                } finally {
-
-                    setLoading(false);
-
-                }
-
-            };
-
-
-        loadProfile();
+        loadClient();
 
     }, [id]);
 
 
+    // =====================================================
+    // GET CLIENT BY ID
+    // GET /api/clients/:id
+    // =====================================================
+
+    const loadClient = async () => {
+
+        try {
+
+            setLoading(true);
+
+            setError("");
+
+            console.log(
+                "LOADING CLIENT:",
+                id
+            );
+
+
+            const response = await api.get(
+                `/clients/${id}`
+            );
+
+
+            console.log(
+                "CLIENT PROFILE RESPONSE:",
+                response.data
+            );
+
+
+            setClient(
+                response.data.client
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "PROFILE ERROR:",
+                error
+            );
+
+
+            setError(
+                error.response?.data?.message ||
+                "Failed to load client profile"
+            );
+
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+
+    // =====================================================
+    // LOADING
+    // =====================================================
+
     if (loading) {
 
         return (
-            <h2>
-                Loading client profile...
-            </h2>
+
+            <div className="client-profile-page">
+
+                <div className="profile-loading">
+
+                    Loading client profile...
+
+                </div>
+
+            </div>
+
         );
 
     }
 
+
+    // =====================================================
+    // ERROR
+    // =====================================================
 
     if (error) {
 
         return (
-            <div>
 
-                <h3>
-                    {error}
-                </h3>
+            <div className="client-profile-page">
 
                 <button
-                    onClick={() =>
-                        navigate("/clients")
-                    }
+                    type="button"
+                    className="back-button"
+                    onClick={() => navigate("/clients")}
                 >
-                    Back to Clients
+                    ← Back to Clients
                 </button>
 
+
+                <div className="profile-error">
+
+                    {error}
+
+                </div>
+
             </div>
+
         );
 
     }
 
+
+    // =====================================================
+    // CLIENT NOT FOUND
+    // =====================================================
 
     if (!client) {
 
         return (
-            <h3>
-                Client not found
-            </h3>
+
+            <div className="client-profile-page">
+
+                <button
+                    type="button"
+                    className="back-button"
+                    onClick={() => navigate("/clients")}
+                >
+                    ← Back to Clients
+                </button>
+
+
+                <div className="profile-error">
+
+                    Client not found
+
+                </div>
+
+            </div>
+
         );
 
     }
 
 
+    // =====================================================
+    // MAIN UI
+    // =====================================================
+
     return (
 
-        <div className="client-profile">
+        <div className="client-profile-page">
+
+
+            {/* ================================================= */}
+            {/* BACK BUTTON */}
+            {/* ================================================= */}
 
             <button
-                onClick={() =>
-                    navigate("/clients")
-                }
+                type="button"
+                className="back-button"
+                onClick={() => navigate("/clients")}
             >
+
                 ← Back to Clients
+
             </button>
 
 
-            <h1>
-                {client.client_name}
-            </h1>
+
+            {/* ================================================= */}
+            {/* PROFILE HEADER */}
+            {/* ================================================= */}
+
+            <div className="profile-header">
 
 
-            <p>
-                Status:
-                {" "}
-                {client.status}
-            </p>
+                <div className="profile-header-left">
 
 
-            {/* ============================ */}
+                    {/* AVATAR */}
+
+                    <div className="profile-avatar">
+
+                        {client.client_name
+                            ?.charAt(0)
+                            ?.toUpperCase()
+                        }
+
+                    </div>
+
+
+                    {/* CLIENT NAME */}
+
+                    <div>
+
+                        <h1>
+                            {client.client_name}
+                        </h1>
+
+
+                        <div className="profile-meta">
+
+                            <span>
+                                Client ID: {client.id}
+                            </span>
+
+
+                            <span>
+                                {client.client_type || "-"}
+                            </span>
+
+
+                            <span
+                                className={
+                                    client.status === "active"
+                                        ? "status-badge active"
+                                        : "status-badge inactive"
+                                }
+                            >
+
+                                {client.status || "active"}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {/* EDIT BUTTON */}
+
+                <button
+                    type="button"
+                    className="primary-button"
+                    onClick={() => {
+                        console.log(
+                            "EDIT CLIENT:",
+                            client.id
+                        );
+                    }}
+                >
+
+                    Edit Client
+
+                </button>
+
+            </div>
+
+
+
+            {/* ================================================= */}
             {/* BASIC INFORMATION */}
-            {/* ============================ */}
+            {/* ================================================= */}
 
-            <div className="profile-card">
+            <div className="profile-section">
 
-                <h2>
-                    Basic Information
-                </h2>
+                <div className="profile-section-header">
 
+                    <div>
 
-                <p>
-                    <strong>
-                        Email:
-                    </strong>{" "}
-                    {client.email || "-"}
-                </p>
+                        <h2>
+                            Basic Information
+                        </h2>
 
+                        <p>
+                            Client contact and business details
+                        </p>
 
-                <p>
-                    <strong>
-                        Phone:
-                    </strong>{" "}
-                    {client.phone || "-"}
-                </p>
+                    </div>
+
+                </div>
 
 
-                <p>
-                    <strong>
-                        Client Type:
-                    </strong>{" "}
-                    {client.client_type || "-"}
-                </p>
+                <div className="profile-grid">
 
 
-                <p>
-                    <strong>
-                        Address:
-                    </strong>{" "}
-                    {client.address || "-"}
-                </p>
+                    {/* EMAIL */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <div>
+                            {client.email || "-"}
+                        </div>
+
+                    </div>
+
+
+                    {/* PHONE */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Phone
+                        </label>
+
+                        <div>
+                            {client.phone || "-"}
+                        </div>
+
+                    </div>
+
+
+                    {/* CLIENT TYPE */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Client Type
+                        </label>
+
+                        <div>
+                            {client.client_type || "-"}
+                        </div>
+
+                    </div>
+
+
+                    {/* ADDRESS */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Address
+                        </label>
+
+                        <div>
+                            {client.address || "-"}
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            {/* ============================ */}
+
+            {/* ================================================= */}
             {/* TAX INFORMATION */}
-            {/* ============================ */}
+            {/* ================================================= */}
 
-            <div className="profile-card">
+            <div className="profile-section">
 
-                <h2>
-                    Tax Information
-                </h2>
+                <div className="profile-section-header">
 
+                    <div>
 
-                <p>
-                    <strong>
-                        PAN:
-                    </strong>{" "}
+                        <h2>
+                            Tax Information
+                        </h2>
 
-                    {taxInformation?.pan_number
-                        || client.pan_number
-                        || "-"
-                    }
+                        <p>
+                            PAN and GST information
+                        </p>
 
-                </p>
+                    </div>
 
-
-                <p>
-                    <strong>
-                        GST:
-                    </strong>{" "}
-
-                    {taxInformation?.gst_number
-                        || client.gst_number
-                        || "-"
-                    }
-
-                </p>
+                </div>
 
 
-                <p>
-                    <strong>
-                        GST Type:
-                    </strong>{" "}
-
-                    {taxInformation?.gst_type
-                        || "-"
-                    }
-
-                </p>
+                <div className="profile-grid">
 
 
-                <p>
-                    <strong>
-                        ITR Type:
-                    </strong>{" "}
+                    {/* PAN */}
 
-                    {taxInformation?.itr_type
-                        || "-"
-                    }
+                    <div className="profile-field">
 
-                </p>
+                        <label>
+                            PAN Number
+                        </label>
+
+                        <div>
+                            {client.pan_number || "-"}
+                        </div>
+
+                    </div>
 
 
-                <p>
-                    <strong>
-                        Financial Year:
-                    </strong>{" "}
+                    {/* GST */}
 
-                    {taxInformation?.financial_year
-                        || "-"
-                    }
+                    <div className="profile-field">
 
-                </p>
+                        <label>
+                            GST Number
+                        </label>
+
+                        <div>
+                            {client.gst_number || "-"}
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-{/* ============================ */}
-{/* DOCUMENTS */}
-{/* ============================ */}
 
-<div className="profile-card">
+            {/* ================================================= */}
+            {/* CLIENT INFORMATION */}
+            {/* ================================================= */}
 
-    <div
-        style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-        }}
-    >
+            <div className="profile-section">
 
-        <h2>
-            Documents
-        </h2>
+                <div className="profile-section-header">
 
+                    <div>
 
-        <button
-            onClick={() =>
-                document.getElementById(
-                    "document-upload-input"
-                ).click()
-            }
-        >
-            + Upload Document
-        </button>
+                        <h2>
+                            Client Information
+                        </h2>
 
-    </div>
+                        <p>
+                            Account information
+                        </p>
+
+                    </div>
+
+                </div>
 
 
-    <input
-        id="document-upload-input"
-        type="file"
-        style={{
-            display: "none"
-        }}
-    />
+                <div className="profile-grid">
 
 
-    {documents.length === 0 ? (
+                    {/* CLIENT ID */}
 
-        <p>
-            No documents uploaded yet.
-        </p>
+                    <div className="profile-field">
 
-    ) : (
+                        <label>
+                            Client ID
+                        </label>
 
-        <table>
+                        <div>
+                            {client.id}
+                        </div>
 
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Document
-                    </th>
-
-                    <th>
-                        Type
-                    </th>
-
-                    <th>
-                        File
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
-                </tr>
-
-            </thead>
+                    </div>
 
 
-            <tbody>
+                    {/* STATUS */}
 
-                {documents.map(
-                    (document) => (
+                    <div className="profile-field">
 
-                        <tr
-                            key={
-                                document.id
+                        <label>
+                            Status
+                        </label>
+
+                        <div>
+
+                            <span
+                                className={
+                                    client.status === "active"
+                                        ? "status-badge active"
+                                        : "status-badge inactive"
+                                }
+                            >
+
+                                {client.status || "active"}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* CREATED */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Created On
+                        </label>
+
+                        <div>
+
+                            {client.created_at
+                                ? new Date(
+                                    client.created_at
+                                ).toLocaleDateString(
+                                    "en-IN",
+                                    {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric"
+                                    }
+                                )
+                                : "-"
                             }
-                        >
 
-                            <td>
-                                {
-                                    document.document_name
-                                }
-                            </td>
+                        </div>
+
+                    </div>
 
 
-                            <td>
-                                {
-                                    document.document_type
-                                }
-                            </td>
+                    {/* UPDATED */}
+
+                    <div className="profile-field">
+
+                        <label>
+                            Last Updated
+                        </label>
+
+                        <div>
+
+                            {client.updated_at
+                                ? new Date(
+                                    client.updated_at
+                                ).toLocaleDateString(
+                                    "en-IN",
+                                    {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric"
+                                    }
+                                )
+                                : "-"
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
-                            <td>
-                                {
-                                    document.file_name
-                                }
-                            </td>
+        </div>
 
-
-                            <td>
-                                {
-                                    document.document_status
-                                }
-                            </td>
-
-
-                            <td>
-
-                                <button>
-                                    View
-                                </button>
-
-
-                                <button>
-                                    Delete
-                                </button>
-
-                            </td>
-
-                        </tr>
-
-                    )
-                )}
-
-            </tbody>
-
-        </table>
-
-    )}
-
-</div>
-
-</div>
-
-);
+    );
 
 }
 

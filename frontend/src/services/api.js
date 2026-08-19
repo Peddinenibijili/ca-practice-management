@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 const api = axios.create({
 
     baseURL: "http://localhost:5000/api",
@@ -12,9 +11,9 @@ const api = axios.create({
 });
 
 
-// ==========================================
+// =====================================================
 // ADD JWT TO EVERY REQUEST
-// ==========================================
+// =====================================================
 
 api.interceptors.request.use(
 
@@ -23,6 +22,16 @@ api.interceptors.request.use(
         const token =
             localStorage.getItem("token");
 
+        console.log(
+            "API REQUEST:",
+            config.method?.toUpperCase(),
+            config.url
+        );
+
+        console.log(
+            "TOKEN EXISTS:",
+            !!token
+        );
 
         if (token) {
 
@@ -30,7 +39,6 @@ api.interceptors.request.use(
                 `Bearer ${token}`;
 
         }
-
 
         return config;
 
@@ -45,9 +53,9 @@ api.interceptors.request.use(
 );
 
 
-// ==========================================
-// HANDLE AUTH ERRORS
-// ==========================================
+// =====================================================
+// HANDLE API ERRORS
+// =====================================================
 
 api.interceptors.response.use(
 
@@ -58,6 +66,13 @@ api.interceptors.response.use(
     },
 
     (error) => {
+
+        console.error(
+            "API ERROR:",
+            error.response?.status,
+            error.response?.data
+        );
+
 
         if (
             error.response?.status === 401 ||
@@ -78,10 +93,5 @@ api.interceptors.response.use(
 
 );
 
-
-await api.post(
-    `/clients/${id}/documents`,
-    formData
-);
 
 export default api;

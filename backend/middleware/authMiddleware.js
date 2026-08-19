@@ -4,12 +4,14 @@ const authenticateToken = (req, res, next) => {
 
     try {
 
-        // ---------------------------------------------
-        // Get Authorization header
-        // ---------------------------------------------
-
         const authHeader =
             req.headers.authorization;
+
+
+        console.log(
+            "AUTH HEADER:",
+            authHeader
+        );
 
 
         if (!authHeader) {
@@ -23,11 +25,6 @@ const authenticateToken = (req, res, next) => {
 
         }
 
-
-        // ---------------------------------------------
-        // Expected:
-        // Authorization: Bearer TOKEN
-        // ---------------------------------------------
 
         const parts =
             authHeader.split(" ");
@@ -51,10 +48,6 @@ const authenticateToken = (req, res, next) => {
         const token = parts[1];
 
 
-        // ---------------------------------------------
-        // Verify JWT
-        // ---------------------------------------------
-
         const decoded =
             jwt.verify(
                 token,
@@ -62,9 +55,11 @@ const authenticateToken = (req, res, next) => {
             );
 
 
-        // ---------------------------------------------
-        // Attach user to request
-        // ---------------------------------------------
+        console.log(
+            "JWT DECODED:",
+            decoded
+        );
+
 
         req.user = decoded;
 
@@ -80,7 +75,7 @@ const authenticateToken = (req, res, next) => {
         );
 
 
-        return res.status(403).json({
+        return res.status(401).json({
 
             message:
                 "Invalid or expired token"

@@ -1,35 +1,59 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import api from "../services/api";
-
-import "./Clients.css";
-
 
 function Clients() {
 
+    // =====================================================
+    // CLIENT LIST STATE
+    // =====================================================
+
     const navigate = useNavigate();
-
-
-    // =================================================
-    // STATE
-    // =================================================
-
     const [clients, setClients] = useState([]);
-
     const [loading, setLoading] = useState(true);
 
-    const [error, setError] = useState("");
 
-    const [search, setSearch] = useState("");
+    // =====================================================
+    // ADD CLIENT MODAL STATE
+    // =====================================================
 
-    const [typeFilter, setTypeFilter] = useState("all");
+    const [showAddClient, setShowAddClient] = useState(false);
 
-    const [statusFilter, setStatusFilter] = useState("all");
 
-    // =================================================
-    // LOAD CLIENTS
-    // =================================================
+    // =====================================================
+    // FORM STATE
+    // =====================================================
+
+    const [formData, setFormData] = useState({
+        client_name: "",
+        email: "",
+        phone: "",
+        pan_number: "",
+        gst_number: "",
+        client_type: "Business",
+        address: "",
+        status: "active"
+    });
+
+
+    const [formLoading, setFormLoading] = useState(false);
+    const [formError, setFormError] = useState("");
+
+
+    // =====================================================
+    // LOAD CLIENTS WHEN PAGE LOADS
+    // =====================================================
+
+    useEffect(() => {
+
+        loadClients();
+
+    }, []);
+
+
+    // =====================================================
+    // GET CLIENTS
+    // =====================================================
 
     const loadClients = async () => {
 
@@ -37,10 +61,9 @@ function Clients() {
 
             setLoading(true);
 
-            setError("");
+            const response = await api.get("/clients");
 
-            const response =
-                await api.get("/clients");
+            console.log("CLIENTS RESPONSE:", response.data);
 
             setClients(
                 response.data.clients || []
@@ -53,11 +76,6 @@ function Clients() {
                 error
             );
 
-            setError(
-                error.response?.data?.message ||
-                "Failed to load clients"
-            );
-
         } finally {
 
             setLoading(false);
@@ -66,138 +84,190 @@ function Clients() {
 
     };
 
-    const handleDelete = async (client) => {
 
-        const confirmed =
-            window.confirm(
-            `Are you sure you want to delete ${client.client_name}?`
+    // =====================================================
+    // HANDLE FORM INPUT
+    // =====================================================
+
+    const handleFormChange = (e) => {
+
+        const { name, value } = e.target;
+
+        setFormData((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+
+    };
+
+
+    // =====================================================
+    // RESET FORM
+    // =====================================================
+
+    const resetForm = () => {
+
+        setFormData({
+            client_name: "",
+            email: "",
+            phone: "",
+            pan_number: "",
+            gst_number: "",
+            client_type: "Business",
+            address: "",
+            status: "active"
+        });
+
+        setFormError("");
+
+    };
+
+
+    // =====================================================
+    // OPEN ADD CLIENT MODAL
+    // =====================================================
+
+    const openAddClientModal = () => {
+
+        resetForm();
+
+        setShowAddClient(true);
+
+    };
+
+
+    // =====================================================
+    // CLOSE ADD CLIENT MODAL
+    // =====================================================
+
+    const closeAddClientModal = () => {
+
+        if (formLoading) {
+            return;
+        }
+
+        setShowAddClient(false);
+
+        resetForm();
+
+    };
+
+
+    // =====================================================
+    // ADD CLIENT
+    // POST /api/clients
+    // =====================================================
+
+    const handleAddClient = async (e) => {
+
+        e.preventDefault();
+
+        setFormError("");
+
+
+        // ---------------------------------------------
+        // Validate Client Name
+        // ---------------------------------------------
+
+        if (!formData.client_name.trim()) {
+
+            setFormError(
+                "Client name is required"
             );
-
-
-        if (!confirmed) {
 
             return;
 
         }
 
+
         try {
 
-            await api.delete(
-                `/clients/${client.id}`
+            setFormLoading(true);
+
+            console.log(
+                "ADDING CLIENT:",
+                formData
             );
 
 
-            setClients((currentClients) =>
-                currentClients.filter(
-                    (item) =>
-                        item.id !== client.id
-                )
+            // -----------------------------------------
+            // POST REQUEST
+            // -----------------------------------------
+
+            const response = await api.post(
+                "/clients",
+                formData
             );
 
-            alert(
-                "Client deleted successfully."
+
+            console.log(
+                "CLIENT CREATED:",
+                response.data
             );
+
+
+            // -----------------------------------------
+            // CLOSE MODAL
+            // -----------------------------------------
+
+            setShowAddClient(false);
+
+
+            // -----------------------------------------
+            // RESET FORM
+            // -----------------------------------------
+
+            resetForm();
+
+
+            // -----------------------------------------
+            // REFRESH CLIENT LIST
+            // -----------------------------------------
+
+            await loadClients();
+
 
         } catch (error) {
 
             console.error(
-                "DELETE CLIENT ERROR:",
+                "ADD CLIENT ERROR:",
                 error
-          );
+            );
 
 
-            alert(
+            // -----------------------------------------
+            // SHOW BACKEND ERROR
+            // -----------------------------------------
+
+            setFormError(
                 error.response?.data?.message ||
-                "Failed to delete client."
-           );
+                "Failed to create client"
+            );
+
+
+        } finally {
+
+            setFormLoading(false);
 
         }
 
     };
-    
-
-    // =================================================
-    // LOAD ON PAGE OPEN
-    // =================================================
-
-    useEffect(() => {
-
-        loadClients();
-
-    }, []);
 
 
-    // =================================================
-    // SEARCH
-    // =================================================
-
-    const filteredClients =
-        clients.filter((client) => {
-
-            const searchText =
-                search.toLowerCase();
-
-
-            const matchesSearch =
-
-                client.client_name
-                    ?.toLowerCase()
-                    .includes(searchText)
-
-                ||
-
-                client.email
-                    ?.toLowerCase()
-                    .includes(searchText)
-
-                ||
-
-                client.phone
-                    ?.toLowerCase()
-                    .includes(searchText)
-
-                ||
-
-                client.gst_number
-                    ?.toLowerCase()
-                    .includes(searchText);
-
-
-            const matchesType =
-
-                typeFilter === "all" ||
-
-                client.client_type === typeFilter;
-
-
-            const matchesStatus =
-
-                statusFilter === "all" ||
-
-                client.status === statusFilter;
-
-
-            return (
-                matchesSearch &&
-                matchesType &&
-                matchesStatus
-            );
-        });
-
-    // =================================================
+    // =====================================================
     // RENDER
-    // =================================================
+    // =====================================================
 
     return (
 
         <div className="clients-page">
 
 
-            {/* =========================================
-                HEADER
-            ========================================= */}
+            {/* ================================================= */}
+            {/* PAGE HEADER */}
+            {/* ================================================= */}
 
-            <div className="clients-header">
+            <div className="page-header">
 
                 <div>
 
@@ -206,218 +276,143 @@ function Clients() {
                     </h1>
 
                     <p>
-                        Manage your practice clients
+                        Manage and view all your clients
                     </p>
 
                 </div>
 
 
+                {/* ============================================= */}
+                {/* ADD CLIENT BUTTON */}
+                {/* ============================================= */}
+
                 <button
-                    className="add-client-button"
-                    onClick={() =>
-                        navigate("/clients/new")
-                    }
+                    className="primary-button"
+                    type="button"
+                    onClick={openAddClientModal}
                 >
-                    + Add Client
+
+                    <span>＋</span>
+
+                    Add Client
+
                 </button>
 
             </div>
 
 
-            {/* =========================================
-                SEARCH
-            ========================================= */}
+
+            {/* ================================================= */}
+            {/* FILTER BAR */}
+            {/* ================================================= */}
 
             <div className="clients-toolbar">
 
-                <input
-                    type="text"
-                    placeholder="Search clients..."
-                    value={search}
-                    onChange={(event) =>
-                        setSearch(
-                            event.target.value
-                        )
-                    }
-                />
-                <select
-                    value={typeFilter}
-                    onChange={(event) =>
-                        setTypeFilter(event.target.value)
-                    }
-               >
 
-                <option value="all">
-                    All Types
-                </option>
+                {/* SEARCH */}
+                <div className="client-search">
 
-                <option value="Business">
-                    Business
-                </option>
+                    <span>⌕</span>
 
-                <option value="Individual">
-                    Individual
-                </option>
+                    <input
+                        type="text"
+                        placeholder="Search clients by name, email, phone, PAN, GST..."
+                    />
 
-                <option value="Company">
-                    Company
-                </option>
+                </div>
 
-                <option value="Partnership">
-                    Partnership
-                </option>
 
-                <option value="LLP">
-                    LLP
-                </option>
+                {/* TYPE FILTER */}
+                <select className="filter-select">
 
-                <option value="Trust">
-                    Trust
-                </option>
+                    <option value="">
+                        All Types
+                    </option>
+
+                    <option value="Individual">
+                        Individual
+                    </option>
+
+                    <option value="Business">
+                        Business
+                    </option>
 
                 </select>
-                <select
-                    value={statusFilter}
-                    onChange={(event) =>
-                        setStatusFilter(event.target.value)
-                   }
+
+
+                {/* STATUS FILTER */}
+                <select className="filter-select">
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option value="active">
+                        Active
+                    </option>
+
+                    <option value="inactive">
+                        Inactive
+                    </option>
+
+                </select>
+
+
+                {/* CLIENT COUNT */}
+                <div className="client-count">
+
+                    {clients.length} clients
+
+                </div>
+
+
+                {/* REFRESH */}
+                <button
+                    className="refresh-button"
+                    onClick={loadClients}
+                    type="button"
+                    disabled={loading}
                 >
 
-                <option value="all">
-                    All Status
-                </option>
+                    ↻
 
-                <option value="active">
-                    Active
-                </option>
-
-                <option value="inactive">
-                    Inactive
-                </option>
-
-                <option value="pending">
-                    Pending
-                </option>
-
-                <option value="suspended">
-                    Suspended
-                </option>
-
-                <option value="closed">
-                    Closed
-                </option>
-
-                <option value="completed">
-                    Completed
-                </option>
-
-                </select>
-
-                <span>
-                    {filteredClients.length} clients
-                </span>
+                </button>
 
             </div>
 
 
-            {/* =========================================
-                ERROR
-            ========================================= */}
 
-            {error && (
+            {/* ================================================= */}
+            {/* CLIENT TABLE */}
+            {/* ================================================= */}
 
-                <div className="error-message">
+            <div className="clients-card">
 
-                    {error}
+                <div className="table-wrapper">
 
-                    <button
-                        onClick={loadClients}
-                    >
-                        Retry
-                    </button>
-
-                </div>
-
-            )}
+                    <table className="clients-table">
 
 
-            {/* =========================================
-                LOADING
-            ========================================= */}
-
-            {loading && (
-
-                <div className="loading">
-
-                    Loading clients...
-
-                </div>
-
-            )}
-
-
-            {/* =========================================
-                EMPTY STATE
-            ========================================= */}
-
-            {!loading &&
-             !error &&
-             filteredClients.length === 0 && (
-
-                <div className="empty-state">
-
-                    <h2>
-                        No clients found
-                    </h2>
-
-                    <p>
-                        Add your first client
-                        to get started.
-                    </p>
-
-                    <button
-                        onClick={() =>
-                            navigate("/clients/new")
-                        }
-                    >
-                        + Add Client
-                    </button>
-
-                </div>
-
-            )}
-
-
-            {
-            /* =========================================
-                CLIENT TABLE
-            ========================================= */}
-
-            {!loading &&
-             filteredClients.length > 0 && (
-
-                <div className="clients-table-container">
-
-                    <table>
+                        {/* TABLE HEADER */}
 
                         <thead>
 
                             <tr>
 
                                 <th>
-                                    Client
+                                    CLIENT
                                 </th>
 
                                 <th>
-                                    Type
+                                    TYPE
                                 </th>
 
                                 <th>
-                                    Email
+                                    EMAIL
                                 </th>
 
                                 <th>
-                                    Phone
+                                    PHONE
                                 </th>
 
                                 <th>
@@ -425,11 +420,15 @@ function Clients() {
                                 </th>
 
                                 <th>
-                                    Status
+                                    STATUS
                                 </th>
 
                                 <th>
-                                    Actions
+                                    ADDED ON
+                                </th>
+
+                                <th>
+                                    ACTIONS
                                 </th>
 
                             </tr>
@@ -437,109 +436,537 @@ function Clients() {
                         </thead>
 
 
+
+                        {/* TABLE BODY */}
+
                         <tbody>
 
-                            {filteredClients.map(
-                                (client) => (
+
+                            {/* LOADING */}
+
+                            {loading ? (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="8"
+                                        className="table-message"
+                                    >
+
+                                        Loading clients...
+
+                                    </td>
+
+                                </tr>
+
+
+                            ) : clients.length === 0 ? (
+
+
+                                /* NO CLIENTS */
+
+                                <tr>
+
+                                    <td
+                                        colSpan="8"
+                                        className="table-message"
+                                    >
+
+                                        No clients found
+
+                                    </td>
+
+                                </tr>
+
+
+                            ) : (
+
+
+                                /* CLIENT LIST */
+
+                                clients.map((client) => (
 
                                     <tr
                                         key={client.id}
                                     >
 
+
+                                        {/* CLIENT */}
+
                                         <td>
 
-                                            <strong>
-                                                {
-                                                    client.client_name
-                                                }
-                                            </strong>
+                                            <div className="client-name client-name-clickable"
+                                                onClick={() => navigate(`/clients/${client.id}`)}
+                                            >
+
+                                                <div className="client-avatar">
+
+                                                    {client.client_name
+                                                        ?.charAt(0)
+                                                        ?.toUpperCase()}
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <strong>
+                                                        {client.client_name}
+                                                    </strong>
+
+                                                    <small>
+                                                        ID: {client.id}
+                                                    </small>
+
+                                                </div>
+
+                                            </div>                                               
+                                    
+                                            <div>
+                                            </div>
 
                                         </td>
 
-                                        <td>
-                                            {
-                                                client.client_type ||
-                                                "-"
-                                            }
-                                        </td>
+
+                                        {/* TYPE */}
 
                                         <td>
-                                            {
-                                                client.email ||
-                                                "-"
-                                            }
+                                            {client.client_type || "-"}
                                         </td>
 
-                                        <td>
-                                            {
-                                                client.phone ||
-                                                "-"
-                                            }
-                                        </td>
+
+                                        {/* EMAIL */}
 
                                         <td>
-                                            {
-                                                client.gst_number ||
-                                                "-"
-                                            }
+                                            {client.email || "-"}
                                         </td>
+
+
+                                        {/* PHONE */}
+
+                                        <td>
+                                            {client.phone || "-"}
+                                        </td>
+
+
+                                        {/* GST */}
+
+                                        <td>
+                                            {client.gst_number || "-"}
+                                        </td>
+
+
+                                        {/* STATUS */}
 
                                         <td>
 
                                             <span
                                                 className={
-                                                    client.status ===
-                                                    "active"
-                                                        ? "status-active"
-                                                        : "status-inactive"
+                                                    client.status === "active"
+                                                        ? "status-badge active"
+                                                        : "status-badge inactive"
                                                 }
                                             >
-                                                {
-                                                    client.status
-                                                }
+
+                                                {client.status || "active"}
+
                                             </span>
 
                                         </td>
 
+
+                                        {/* CREATED DATE */}
+
+                                        <td>
+
+                                            {client.created_at
+                                                ? new Date(
+                                                    client.created_at
+                                                ).toLocaleDateString(
+                                                    "en-IN",
+                                                    {
+                                                        day: "2-digit",
+                                                        month: "short",
+                                                        year: "numeric"
+                                                    }
+                                                )
+                                                : "-"
+                                            }
+
+                                        </td>
+
+
+                                        {/* ACTION */}
+
                                         <td>
 
                                             <button
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/clients/${client.id}/profile`
-                                                    )
-                                                }
+                                                className="action-button"
+                                                type="button"
                                             >
-                                                View
-                                            </button>
 
-                                            <button
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/clients/${client.id}/edit`
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() =>
-                                                    handleDelete(client)
-                                                }
-                                            >
-                                                Delete
+                                                ⋮
+
                                             </button>
 
                                         </td>
 
                                     </tr>
 
-                                )
+                                ))
+
                             )}
 
                         </tbody>
 
                     </table>
+
+                </div>
+
+
+
+                {/* ================================================= */}
+                {/* TABLE FOOTER */}
+                {/* ================================================= */}
+
+                <div className="clients-footer">
+
+                    <span>
+
+                        Showing 1 to {clients.length} of{" "}
+
+                        {clients.length} clients
+
+                    </span>
+
+
+                    <div className="pagination">
+
+                        <button
+                            type="button"
+                            disabled
+                        >
+                            ‹
+                        </button>
+
+
+                        <button
+                            type="button"
+                            className="current-page"
+                        >
+                            1
+                        </button>
+
+
+                        <button
+                            type="button"
+                            disabled
+                        >
+                            ›
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            {/* ================================================= */}
+            {/* ADD CLIENT MODAL */}
+            {/* ================================================= */}
+
+            {showAddClient && (
+
+                <div className="modal-overlay">
+
+
+                    <div className="add-client-modal">
+
+
+                        {/* ========================================= */}
+                        {/* MODAL HEADER */}
+                        {/* ========================================= */}
+
+                        <div className="modal-header">
+
+                            <div>
+
+                                <h2>
+                                    Add Client
+                                </h2>
+
+                                <p>
+                                    Add a new client to your practice
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="modal-close"
+                                onClick={closeAddClientModal}
+                                disabled={formLoading}
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+
+
+                        {/* ========================================= */}
+                        {/* FORM */}
+                        {/* ========================================= */}
+
+                        <form
+                            onSubmit={handleAddClient}
+                        >
+
+
+                            {/* FORM ERROR */}
+
+                            {formError && (
+
+                                <div className="form-error">
+
+                                    {formError}
+
+                                </div>
+
+                            )}
+
+
+
+                            {/* CLIENT NAME */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Client Name *
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="client_name"
+                                    value={formData.client_name}
+                                    onChange={handleFormChange}
+                                    placeholder="Enter client name"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* CLIENT TYPE */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Client Type
+                                </label>
+
+                                <select
+                                    name="client_type"
+                                    value={formData.client_type}
+                                    onChange={handleFormChange}
+                                    disabled={formLoading}
+                                >
+
+                                    <option value="Business">
+                                        Business
+                                    </option>
+
+                                    <option value="Individual">
+                                        Individual
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            {/* EMAIL */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleFormChange}
+                                    placeholder="client@example.com"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* PHONE */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Phone
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleFormChange}
+                                    placeholder="Enter phone number"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* PAN */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    PAN Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="pan_number"
+                                    value={formData.pan_number}
+                                    onChange={handleFormChange}
+                                    placeholder="ABCDE1234F"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* GST */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    GST Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="gst_number"
+                                    value={formData.gst_number}
+                                    onChange={handleFormChange}
+                                    placeholder="37ABCDE1234F1Z5"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* ADDRESS */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Address
+                                </label>
+
+                                <textarea
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleFormChange}
+                                    placeholder="Enter client address"
+                                    rows="3"
+                                    disabled={formLoading}
+                                />
+
+                            </div>
+
+
+
+                            {/* STATUS */}
+
+                            <div className="form-group">
+
+                                <label>
+                                    Status
+                                </label>
+
+                                <select
+                                    name="status"
+                                    value={formData.status}
+                                    onChange={handleFormChange}
+                                    disabled={formLoading}
+                                >
+
+                                    <option value="active">
+                                        Active
+                                    </option>
+
+                                    <option value="inactive">
+                                        Inactive
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            {/* ========================================= */}
+                            {/* MODAL ACTIONS */}
+                            {/* ========================================= */}
+
+                            <div className="modal-actions">
+
+
+                                {/* CANCEL */}
+
+                                <button
+                                    type="button"
+                                    className="cancel-btn"
+                                    onClick={closeAddClientModal}
+                                    disabled={formLoading}
+                                >
+
+                                    Cancel
+
+                                </button>
+
+
+                                {/* SAVE */}
+
+                                <button
+                                    type="submit"
+                                    className="save-client-btn"
+                                    disabled={formLoading}
+                                >
+
+                                    {formLoading
+                                        ? "Saving..."
+                                        : "Save Client"
+                                    }
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
 
                 </div>
 
