@@ -1,26 +1,29 @@
 import React from "react";
+
 import Sidebar from "./Sidebar";
 import TopNavbar from "./TopNavbar";
 
-function MainLayout({ children }) {
+import "./MainLayout.css";
+
+export default function MainLayout({ children }) {
 
     return (
-        <div className="app-layout">
+
+        <div className="main-layout">
 
             <Sidebar />
 
-            <div className="main-section">
+            <div className="main-area">
 
                 <TopNavbar />
 
-                <main className="main-content">
+                <main className="page-content">
                     {children}
                 </main>
 
             </div>
 
         </div>
+
     );
 }
-
-export default MainLayout;

@@ -1,4 +1,7 @@
 import React from "react";
+import UserProfileMenu from "../UserProfileMenu";
+
+import "./TopNavbar.css";
 
 function TopNavbar() {
 
@@ -74,22 +77,19 @@ function TopNavbar() {
             {/* RIGHT */}
             <div className="navbar-right">
 
-                <button
-                    className="theme-button"
-                    type="button"
-                >
+                {/* Theme button */}
+                <button className="theme-button">
                     ◐
                 </button>
 
-                <div className="profile-avatar">
-                    KR
-                    <span className="online-dot"></span>
-                </div>
+
+                {/* Employee */}
+                <UserProfileMenu />
 
             </div>
 
         </header>
-    );
+)
 }
 
 export default TopNavbar;

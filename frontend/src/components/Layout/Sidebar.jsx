@@ -1,104 +1,149 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import {
+    LayoutDashboard,
+    Users,
+    FileText,
+    ShieldCheck,
+    CalendarDays,
+    CheckSquare,
+    Bell,
+    Settings
+} from "lucide-react";
 
-const menuItems = [
+import OrganizationSelector from "../OrganizationSelector";
+
+import "../Sidebar.css";
+
+const mainMenu = [
     {
-        label: "Home",
+        name: "Dashboard",
         path: "/dashboard",
-        icon: "⌂",
+        icon: LayoutDashboard
     },
     {
-        label: "Leads",
-        path: "/leads",
-        icon: "♙",
-    },
-    {
-        label: "Clients",
+        name: "Clients",
         path: "/clients",
-        icon: "♧",
+        icon: Users
     },
     {
-        label: "Services",
-        path: "/services",
-        icon: "▣",
+        name: "Documents",
+        path: "/documents",
+        icon: FileText
     },
     {
-        label: "Tasks",
-        path: "/tasks",
-        icon: "☑",
+        name: "Compliance",
+        path: "/compliance",
+        icon: ShieldCheck
     },
     {
-        label: "Invoices",
-        path: "/invoices",
-        icon: "▤",
-    },
-    {
-        label: "Team",
-        path: "/team",
-        icon: "♙",
-    },
-    {
-        label: "Reports",
-        path: "/reports",
-        icon: "▥",
-    },
-    {
-        label: "Settings",
-        path: "/settings",
-        icon: "⚙",
-    },
+        name: "Calendar",
+        path: "/calendar",
+        icon: CalendarDays
+    }
 ];
 
-function Sidebar() {
+const workspaceMenu = [
+    {
+        name: "To-Do",
+        path: "/todo",
+        icon: CheckSquare
+    },
+    {
+        name: "Notices",
+        path: "/notices",
+        icon: Bell
+    }
+];
+
+function SidebarMenuItem({ item }) {
+    const Icon = item.icon;
+
+    return (
+        <NavLink
+            to={item.path}
+            className={({ isActive }) =>
+                `sidebar-menu-item ${
+                    isActive ? "active" : ""
+                }`
+            }
+        >
+            <Icon
+                size={19}
+                strokeWidth={1.8}
+            />
+
+            <span>{item.name}</span>
+        </NavLink>
+    );
+}
+
+export default function Sidebar() {
     return (
         <aside className="sidebar">
 
-            {/* BRAND */}
-            <div className="sidebar-brand">
+            {/* =========================
+                ORGANIZATION
+            ========================== */}
 
-                <div className="brand-logo">
-                    CA
-                </div>
+            <div className="sidebar-top">
 
-                <div className="brand-text">
-                    <strong>CA Practice</strong>
-                    <span>Management</span>
-                </div>
+                <OrganizationSelector />
 
             </div>
 
 
-            {/* MENU */}
-            <nav className="sidebar-menu">
+            {/* =========================
+                NAVIGATION
+            ========================== */}
 
-                {menuItems.map((item) => (
+            <div className="sidebar-navigation">
 
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `sidebar-link ${
-                                isActive ? "active" : ""
-                            }`
-                        }
-                    >
+                {/* MAIN */}
 
-                        <span className="sidebar-icon">
-                            {item.icon}
-                        </span>
+                <div className="sidebar-section">
 
-                        <span>
-                            {item.label}
-                        </span>
+                    <div className="sidebar-section-title">
+                        MAIN
+                    </div>
 
-                    </NavLink>
+                    <nav className="sidebar-menu">
 
-                ))}
+                        {mainMenu.map((item) => (
+                            <SidebarMenuItem
+                                key={item.name}
+                                item={item}
+                            />
+                        ))}
 
-            </nav>
+                    </nav>
+
+                </div>
+
+
+                {/* WORKSPACE */}
+
+                <div className="sidebar-section">
+
+                    <div className="sidebar-section-title">
+                        WORKSPACE
+                    </div>
+
+                    <nav className="sidebar-menu">
+
+                        {workspaceMenu.map((item) => (
+                            <SidebarMenuItem
+                                key={item.name}
+                                item={item}
+                            />
+                        ))}
+
+                    </nav>
+
+                </div>
+
+            </div>
 
         </aside>
     );
 }
-
-export default Sidebar;

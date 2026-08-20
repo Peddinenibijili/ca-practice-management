@@ -1,0 +1,325 @@
+/* =========================
+   ORGANIZATION SELECTOR
+========================= */
+
+.organization-selector {
+    position: relative;
+    margin-left: 12px;
+}
+
+.organization-button {
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    cursor: pointer;
+
+    color: #1f2937;
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+.organization-button:hover {
+    background: #f8f7ff;
+    border-color: #d8d2ff;
+}
+
+.organization-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #5b4bdb;
+    color: white;
+
+    font-weight: 700;
+}
+
+.organization-name {
+    max-width: 170px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.organization-arrow {
+    font-size: 9px;
+    color: #6b7280;
+}
+
+
+/* =========================
+   ORGANIZATION DROPDOWN
+========================= */
+
+.organization-dropdown {
+    position: absolute;
+
+    top: 58px;
+    right: 0;
+
+    width: 300px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.12);
+
+    padding: 8px;
+
+    z-index: 1000;
+}
+
+.organization-dropdown-title {
+    padding: 10px 12px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #6b7280;
+}
+
+.organization-option {
+    width: 100%;
+
+    border: none;
+    background: transparent;
+
+    padding: 10px 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 14px;
+}
+
+.organization-option:hover {
+    background: #f5f3ff;
+}
+
+.organization-option.active {
+    background: #f0edff;
+}
+
+.organization-option-icon {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #5b4bdb;
+    color: white;
+
+    font-weight: 700;
+}
+
+.organization-check {
+    margin-left: auto;
+
+    color: #5b4bdb;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   USER PROFILE
+========================= */
+
+.user-profile-container {
+    position: relative;
+    margin-left: 12px;
+}
+
+.user-profile-button {
+    position: relative;
+
+    border: none;
+    background: transparent;
+
+    padding: 0;
+
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eeeaff;
+
+    color: #5b4bdb;
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.online-dot {
+    position: absolute;
+
+    right: 3px;
+    bottom: 3px;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    border: 2px solid white;
+}
+
+
+/* =========================
+   USER DROPDOWN
+========================= */
+
+.user-profile-dropdown {
+    position: absolute;
+
+    top: 74px;
+    right: 0;
+
+    width: 280px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.12);
+
+    padding: 8px;
+
+    z-index: 1000;
+}
+
+.profile-header {
+    padding: 14px;
+
+    display: flex;
+
+    gap: 12px;
+
+    align-items: center;
+}
+
+.profile-avatar {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eeeaff;
+
+    color: #5b4bdb;
+
+    font-weight: 700;
+}
+
+.profile-header strong {
+    display: block;
+
+    font-size: 14px;
+
+    color: #111827;
+}
+
+.profile-header span,
+.profile-header small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+.profile-divider {
+    height: 1px;
+
+    background: #eeeeee;
+
+    margin: 6px 0;
+}
+
+.profile-menu-item {
+    width: 100%;
+
+    border: none;
+
+    background: transparent;
+
+    padding: 11px 12px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    color: #374151;
+}
+
+.profile-menu-item:hover {
+    background: #f5f3ff;
+}
+
+.profile-menu-item.logout {
+    color: #dc2626;
+}
+
+.profile-menu-item.logout:hover {
+    background: #fef2f2;
+}
