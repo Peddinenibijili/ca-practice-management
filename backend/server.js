@@ -21,6 +21,9 @@ const dashboardRoutes =
 const documentRoutes =
     require("./routes/documentRoutes");
 
+const organizationRoutes = 
+    require("./routes/organizationRoutes");
+
 
 dotenv.config();
 
@@ -160,6 +163,13 @@ app.use(
     documentRoutes
 );
 
+//=====================================================
+// ORGANIZATION ROUTES
+// =====================================================    
+app.use(
+    "/api/organization",
+    organizationRoutes
+);
 
 
 // =====================================================
